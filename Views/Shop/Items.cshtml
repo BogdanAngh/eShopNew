@@ -1,0 +1,88 @@
+﻿@model IEnumerable<WebApplication1.Models.ViewModels.Items.ItemsVM>
+
+@{
+    ViewBag.Title = "Items";
+}
+@using PagedList.Mvc;
+@using PagedList;
+@using WebApplication1.Areas.Collab
+
+<link href="/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+<h2>Items</h2>
+
+<select id="SelectedCategory" name="SelectedCategory">
+    <option value="0">All</option>
+
+    @foreach (var item in ViewBag.Categories)
+    {
+        if (ViewBag.SelectedCat == item.Value)
+        {
+            <option selected="selected" value="@item.Value">@item.Text</option>
+        }
+        else
+        {
+            <option value="@item.Value">@item.Text</option>
+        }
+    }
+</select>
+<br /><br />
+
+@if (TempData["Status"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Status"]
+    </div>
+}
+
+<p>
+    @Html.ActionLink("Add new item", "Items/AddItem", "Collab", new {area = ""}, null)
+</p>
+<table class="table">
+    <tr>
+        <th>
+            Title
+        </th>
+        <th>
+            Description
+        </th>
+        <th>
+            Price
+        </th>
+        <th>
+            Score
+        </th>
+        <th>
+            Image
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in ViewBag.OnePageOfItems)
+    {
+        <tr>
+            <td>
+                @item.Title
+            </td>
+            <td>
+                @item.Description
+            </td>
+            <td>
+                @item.Price RON
+            </td>
+            <td>
+                @item.Score
+            </td>
+            <td>
+                <img src="~/Images/Uploads/Items@(item.Id).png" />
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "EditItem", new { id = item.Id }) |
+                @Html.ActionLink("Delete", "DeleteItem", new { id = item.Id })
+            </td>
+        </tr>
+    }
+
+</table>
+
+@Html.PagedListPager((IPagedList)ViewBag.OnePageOfItems, page => Url.Action("Items", new { page, catID = ViewBag.SelectedCat }))
